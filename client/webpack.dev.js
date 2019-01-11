@@ -1,21 +1,46 @@
-const merge = require("webpack-merge");
 const path = require("path");
-let webpack = require("webpack");
-const common = require("./webpack.common.js");
-module.exports = merge(common, {
-  devtool: "inline-soure-map",
+const webpack = require("webpack");
+const CleanWebpackPlugin = require("clean-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+
+console.log(path.resolve(__dirname, "html/front.html"));
+
+module.exports = {
   mode: "development",
-  devServer: {
-    historyApiFallback: true,
-    contentBase: path.resolve(__dirname, "../dist"), //本地服务器所加载的页面所在的目录
-    inline: true, //实时刷新
-    open: true,
-    compress: true,
-    port: 3000,
-    hot: true //开启热更新
+  devtool: "soure-map",
+  output: {
+    path: path.resolve(__dirname, "dist"),
+    filename: "[name].js",
+    chunkFilename: "[name].js"
   },
   plugins: [
-    //热更新,不是刷新
-    new webpack.HotModuleReplacementPlugin()
-  ]
-});
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, "./html/front.html"),
+      chunks: ["front", "back"],
+      minify: {
+        collapseWhitespace: true
+      }
+    }),
+    new CleanWebpackPlugin(["dist"]),
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NamedModulesPlugin()
+  ],
+  devServer: {
+    contentBase: path.join(__dirname, "dist"),
+    port: 8000,
+    hot: true,
+    compress: true,
+    overlay: true
+    // proxy: {
+    //   "/comments": {
+    //     target: "https://m.weibo.cn",
+    //     changeOrigin: true,
+    //     logLevel: "debug",
+    //     headers: {
+    //       Cookie: ""
+    //     }
+    //   }
+    // },
+    // historyApiFallback: true
+  }
+};

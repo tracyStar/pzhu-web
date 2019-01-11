@@ -1,29 +1,21 @@
-const merge = require("webpack-merge");
-const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
+const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const common = require("./webpack.common.js");
+const CleanWebpackPlugin = require("clean-webpack-plugin");
 
-module.exports = merge(common, {
+module.exports = {
   mode: "production",
-  rules: [
-    {
-      test: /\.scss$/,
-      use: [
-        process.env.NODE_ENV !== "production"
-          ? "style-loader"
-          : MiniCssExtractPlugin.loader,
-        "css-loader",
-        "sass-loader"
-      ]
-    }
-  ],
+  output: {
+    path: path.resolve(__dirname, "dist"),
+    filename: "[name]_[hash].js",
+    chunkFilename: "[name]_[hash].js"
+  },
   plugins: [
-    new UglifyJSPlugin(),
     new MiniCssExtractPlugin({
-      // Options similar to the same options in webpackOptions.output
-      // both options are optional
-      filename: "[name].css",
-      chunkFilename: "[id].css"
+      filename: "[name]_[hash].css",
+      chunkFilename: "[id]_[hash].css"
+    }),
+    new CleanWebpackPlugin(["build"], {
+      root: path.resolve(__dirname, "./../static")
     })
   ]
-});
+};
